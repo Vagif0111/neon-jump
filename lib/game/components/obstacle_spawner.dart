@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/game.dart';
 
 import '../neon_jump_game.dart';
 import 'obstacle.dart';
