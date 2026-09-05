@@ -11,31 +11,19 @@ import 'components/scrolling_background.dart';
 import 'managers/audio_manager.dart';
 import 'managers/storage_manager.dart';
 
-/// Neon Jump'ın ana oyun sınıfı.
-///
-/// Sorumlulukları:
-/// - Oyun döngüsünü (update/render) yönetmek
-/// - Zorluk seviyesini (koşu hızı) zamanla artırmak
-/// - Skoru takip etmek ve HUD'a bildirmek
-/// - Tap girdisini oyuncuya iletmek
-/// - Oyun bitişini / duraklatmayı yönetmek
 class NeonJumpGame extends FlameGame
-    with HasCollisionDetection, TapDetector, PanDetector {
+    with HasCollisionDetection, TapCallbacks {
   NeonJumpGame({
     required this.onScoreChanged,
     required this.onGameOver,
   });
 
-  /// HUD'u güncellemek için dışarıya bildirilen skor callback'i.
   final void Function(int score) onScoreChanged;
-
-  /// Oyun bittiğinde çağrılan callback (final skoru taşır).
   final void Function(int finalScore) onGameOver;
 
-  // --- Zorluk / hız ayarları ---
-  static const double _baseSpeed = 260.0; // px/sn, başlangıç koşu hızı
-  static const double _maxSpeed = 620.0; // px/sn, ulaşılabilecek üst sınır
-  static const double _speedRampPerSecond = 6.0; // her saniye hız artışı
+  static const double _baseSpeed = 260.0;
+  static const double _maxSpeed = 620.0;
+  static const double _speedRampPerSecond = 6.0;
 
   double _elapsedSeconds = 0;
   double get worldSpeed =>
@@ -72,10 +60,9 @@ class NeonJumpGame extends FlameGame
     );
     await add(spawner);
 
-    pauseEngine(); // Oyun, kullanıcı "Başlat" demeden akmasın.
+    pauseEngine();
   }
 
-  /// Menüden "Oyna" ile çağrılır: sayaçları sıfırlar ve döngüyü başlatır.
   void startRun() {
     _elapsedSeconds = 0;
     _score = 0;
@@ -102,7 +89,6 @@ class NeonJumpGame extends FlameGame
     onGameOver(_score);
   }
 
-  /// Duraklatma menüsü için dışarıdan çağrılır.
   void pauseRun() {
     if (!_isRunning) return;
     pauseEngine();
@@ -122,7 +108,8 @@ class NeonJumpGame extends FlameGame
   }
 
   @override
-  void onTapDown(TapDownInfo info) {
+  void onTapDown(TapDownEvent event) {
+    super.onTapDown(event);
     if (_isRunning) {
       player.jump();
     }
